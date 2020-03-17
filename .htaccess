@@ -1,0 +1,23 @@
+# Follow symbolic links in this directory.
+Options +FollowSymLinks
+IndexOptions +Charset=UTF-8
+AddDefaultCharset UTF-8
+
+<IfModule mod_rewrite.c>
+
+## Turn on rewrite engine
+RewriteEngine on
+
+## Coupons CMS v7
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^((.*?)(\-(\d+))?)([.]\w+)?$ index.php?lcp=$1&lcp_id=$4&ext=$5 [QSA,L]
+
+</IfModule>
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php72” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php72 .php .php7 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit
