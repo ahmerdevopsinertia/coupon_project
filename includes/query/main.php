@@ -1043,6 +1043,137 @@ public static function group_categories( $category = array(), $special = array()
 
 }
 
+/* GET THE NETWORK */
+
+public static function group_network( $network = array(), $special = array() ) {
+
+    $array = array();
+
+    foreach( \query\main::while_network( $network, $special ) as $c ) {
+        if( $c->is_subcat ) {
+            $array['cat_' . $c->subcatID]['subcats'][] = $c;
+        } else {
+            $array['cat_' . $c->ID]['info'] = $c;
+        }
+    }
+
+    return $array;
+
+}
+
+/* FETCH THE NETWORK */
+
+public static function while_network( $network = array(), $special = array() ) {
+
+    global $db;
+
+    /** make or not seo links */
+    $seo_link = defined( 'SEO_LINKS' ) && SEO_LINKS ? true : false;
+    list( $seo_link_category, $extension ) = array( \query\main::get_option('seo_link_network'), \query\main::get_option( 'extension' ) );
+
+    $categories = \site\utils::validate_user_data( $network );
+
+    $where = $orderby = $limit = array();
+
+    if( isset( $network['max'] ) ) {
+        if( !empty( $network['max'] ) ) {
+            $limit[] = $network['max'];
+        }
+    } else {
+        $page = ( !empty( $categories['page'] ) ? (int) $categories['page'] : ( !empty( $_GET['page'] ) ? (int) $_GET['page'] : 1 ) );
+        $per_page = ( isset( $categories['per_page'] ) ? (int) $categories['per_page'] : \query\main::get_option( 'items_per_page' ) );
+        $offset = isset( $page ) && $page > 1 ? ( $page - 1 ) * $per_page : 0;
+
+        $limit[] = $offset;
+        $limit[] = $per_page;
+    }
+
+    /* WHERE / ORDER BY */
+
+    if( !empty( $categories['ids'] ) && strcasecmp( $categories['ids'], 'all' ) != 0 ) {
+        $arr = array_filter( array_map( function( $w ){
+            return (int) $w;
+        }, explode( ',', $categories['ids'] ) ));
+        if( !empty( $arr ) )
+        $where[] = 'id IN(' . \site\utils::dbp( implode(',', $arr) ) . ')';
+        if( !isset( $categories['orderby'] ) ) {
+            $orderby[] = 'field(id,' . \site\utils::dbp( implode(',', $arr) ) . ')';
+        }
+    }
+
+    if( !empty( $categories['parent'] ) ) {
+        $where[] = 'subcategory = ' . (int) $categories['parent'];
+    }
+
+    if( !empty( $categories['search'] ) ) {
+        $search = implode( '.*', explode( ' ', trim( $categories['search'] ) ) );
+        $where[] = 'CONCAT(name, description) REGEXP "' . \site\utils::dbp( $search ) . '"';
+    }
+
+    if( isset( $categories['show'] ) ) {
+        $show = array_map( 'trim', explode( ',', strtolower( $categories['show'] ) ) );
+        $custom_where_clause = value_with_filter( 'categories_where_clause', array(
+            'cats'      => 'subcategory = 0',
+            'subcats'   => 'subcategory > 0'
+        ) );
+        foreach( $show as $v ) {
+            if( !empty( $custom_where_clause ) && in_array( $v, array_keys( $custom_where_clause ) ) ) {
+                $where[] = $custom_where_clause[$v];
+            }
+        }
+    }
+
+    if( isset( $categories['orderby'] ) ) {
+        $order = array_map( 'trim', explode( ',', strtolower( $categories['orderby'] ) ) );
+        $custom_orderby_clause = value_with_filter( 'categories_orderby_clause', array(
+            'rand'          => 'RAND()',
+            'name'          => 'c.name',
+            'name desc'     => 'c.name DESC',
+            'date'          => 'c.date',
+            'date desc'     => 'c.date DESC'
+        ) );
+
+        foreach( $order as $v ) {
+            if( !empty( $custom_orderby_clause ) && in_array( $v, array_keys( $custom_orderby_clause ) ) ) {
+                $orderby[] = $custom_orderby_clause[$v];
+            }
+        }
+    }
+
+    // special
+    $useem = ( isset( $special['no_emoticons'] ) && $special['no_emoticons'] ) ? false : (boolean) \query\main::get_option( 'smilies_categories' );
+    $usesh = ( isset( $special['no_shortcodes'] ) && $special['no_shortcodes'] ) ? false : true;
+    $useec = ( isset( $special['no_escape'] ) && $special['no_escape'] ) ? false : true;
+    $usefl = ( isset( $special['no_filters'] ) && $special['no_filters'] ) ? false : true;
+
+    /* */
+
+    $stmt = $db->stmt_init();
+    $stmt->prepare( "SELECT id, subcategory, user, name, description, url_title, extra, date,
+     (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "stores WHERE network = c.id) FROM " . DB_TABLE_PREFIX . "network c"
+      . ( empty( $where ) ? '' : ' WHERE ' . implode( ' AND ', array_filter( $where ) ) ) . ( empty( $orderby ) ? '' :
+       ' ORDER BY ' . implode( ', ', array_filter( $orderby ) ) ) . ( empty( $limit ) ? '' : ' LIMIT ' . implode( ',', $limit ) ) );
+    $stmt->execute();
+    $stmt->bind_result( $id, $subcategory, $user, $name, $description, $url_title, $extra, $date, $stores );
+
+    $data = array();
+    while( $stmt->fetch() ) {
+
+        $data[] = (object) array( 'ID' => $id, 'subcatID' => $subcategory, 'user' => $user, 
+        'name' => \site\content::title( 'categories_name_list', $name, $useem, $useec, $usefl ), 
+        'description' => \site\content::content( 'categories_list', $description, $useem, $usesh, false, $useec, $usefl ),
+         'extra' => @unserialize( $extra ), 'date' => $date, 'stores' => $stores, 'is_subcat' => ( $subcategory !== 0 ? true : false ),
+          'url_title' => esc_html( $url_title ), 'link' => ( $seo_link ? \site\utils::make_seo_link( $seo_link_category, $name, $url_title, $id, $extension ) 
+          : $GLOBALS['siteURL'] . '?cat=' . $id ) );
+
+    }
+
+    $stmt->close();
+
+    return $data;
+
+}
+
 /* NUMBER OF USERS */
 
 public static function have_users( $category = array(), $special = array() ) {

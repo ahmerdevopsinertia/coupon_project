@@ -211,7 +211,7 @@ public static function add_store( $opt = array() ) {
     }
 
     $stmt = $db->stmt_init();
-    $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "stores (feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, meta_title, meta_keywords, meta_desc, lastupdate_by, lastupdate, extra, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, NOW())" );
+    $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "stores (feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, meta_title, meta_keywords, meta_desc, lastupdate_by, lastupdate, extra, date, network) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, NOW(), ?)" );
 
     $feedID = isset( $opt['feedID'] ) ? $opt['feedID'] : 0;
     $logo = \site\images::upload( ( !empty( $opt['import_logo'] ) && !empty( $opt['logo_url'] ) && empty( $opt['logo']['name'] ) ? $opt['logo_url'] : $opt['logo'] ), 'logo_', array( 'path' => DIR . '/', 'current' => ( !empty( $opt['logo_url'] ) ? $opt['logo_url'] : '' ) ) );
@@ -219,7 +219,7 @@ public static function add_store( $opt = array() ) {
     $extra = \site\utils::array_sanitize( $opt['extra'] );
     $extra = @serialize( $extra );
 
-    $stmt->bind_param( "iiiiisssssssiisssis", $feedID, $opt['user'], $opt['category'], $opt['popular'], $opt['type'], $opt['name'], $opt['url'], $opt['description'], $opt['tags'], $logo, $hours, $opt['phone'], $opt['sellonline'], $opt['publish'], $opt['meta_title'], $opt['meta_keywords'], $opt['meta_desc'], $GLOBALS['me']->ID, $extra );
+    $stmt->bind_param( "iiiiisssssssiisssisi", $feedID, $opt['user'], $opt['category'], $opt['popular'], $opt['type'], $opt['name'], $opt['url'], $opt['description'], $opt['tags'], $logo, $hours, $opt['phone'], $opt['sellonline'], $opt['publish'], $opt['meta_title'], $opt['meta_keywords'], $opt['meta_desc'], $GLOBALS['me']->ID, $extra, $opt['network']);
 
     if( $stmt->execute() ) {
         $insert_id = $stmt->insert_id;

@@ -350,7 +350,8 @@ if( $_SERVER['REQUEST_METHOD'] == 'POST' && isset( $_POST['csrf'] ) && check_csr
     'meta_title'    => ( isset( $_POST['meta_title'] ) ? $_POST['meta_title'] : '' ),
     'meta_keywords' => ( isset( $_POST['meta_keywords'] ) ? $_POST['meta_keywords'] : '' ),
     'meta_desc'     => ( isset( $_POST['meta_desc'] ) ? $_POST['meta_desc'] : '' ),
-    'extra'         => ( isset( $_POST['extra'] ) ? $_POST['extra'] : array() )
+    'extra'         => ( isset( $_POST['extra'] ) ? $_POST['extra'] : array() ),
+    'network'       => ( isset( $_POST['network'] ) ? $_POST['network'] : 0 ),
     ) ) ) ) ) {
 
     do_action( array( 'admin_store_added_edited', 'admin_store_added' ), $new_store_id );
