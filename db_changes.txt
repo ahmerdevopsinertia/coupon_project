@@ -1,0 +1,3 @@
+added seo_network data inside options table
+added network table
+added network field insdie the stores table
