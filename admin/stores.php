@@ -441,7 +441,6 @@ echo '<div class="title">
 if( isset( $_GET['id'] ) && ( $store_exists = \query\main::store_exists( $_GET['id'] ) ) ) {
 
 $info = \query\main::store_info( $_GET['id'], array( 'no_emoticons' => true, 'no_shortcodes' => true, 'no_filters' => true ) );
-
 echo '<div class="options">
 <a href="#" class="btn">' . t( 'options', "Options" ) . '</a>
 <ul>';
@@ -509,13 +508,14 @@ if( isset( $_POST['change_url_title'] ) ) {
     'meta_title'    => ( isset( $_POST['meta_title'] ) ? $_POST['meta_title'] : '' ),
     'meta_keywords' => ( isset( $_POST['meta_keywords'] ) ? $_POST['meta_keywords'] : '' ),
     'meta_desc'     => ( isset( $_POST['meta_desc'] ) ? $_POST['meta_desc'] : '' ),
-    'extra'         => ( isset( $_POST['extra'] ) ? $_POST['extra'] : array() )
+    'extra'         => ( isset( $_POST['extra'] ) ? $_POST['extra'] : array() ),
+    'network'       => ( isset( $_POST['network'] ) ? $_POST['network'] : 0 )
     ) ) ) ) {
 
     do_action( array( 'admin_store_added_edited', 'admin_store_edited' ), $info->ID );
 
     $info = \query\main::store_info( $_GET['id'], array( 'no_emoticons' => true, 'no_shortcodes' => true, 'no_filters' => true ) );
-
+  
     echo '<div class="a-success">' . t( 'msg_saved', "Saved!" ) . '</div>';
     } else
     echo '<div class="a-error">' . t( 'msg_error', "Error!" ) . '</div>';

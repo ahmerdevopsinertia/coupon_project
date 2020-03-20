@@ -805,11 +805,11 @@ class main
         $network = '<div class="row"><span>' . t('form_network', "Network") . ':</span>
         <div><select name="network">';
         $network .= '<option value="0">Select Network</option>';
-        foreach (\query\main::group_network(array('max' => 0), array('no_emoticons' => true, 'no_filters' => true)) as $cat) {          
-            $network .= '<option value="' . $cat['info']->ID . '"' . (isset($info->catID) && $info->catID == $cat['info']->ID ? ' selected' : '') . '>' . ts($cat['info']->name) . '</option>';
+        foreach (\query\main::group_network(array('max' => 0), array('no_emoticons' => true, 'no_filters' => true)) as $cat) {            
+            $network .= '<option value="' . $cat['info']->ID . '"' . (isset($info->netID) && $info->netID == $cat['info']->ID ? ' selected' : '') . '>' . ts($cat['info']->name) . '</option>';
             if (isset($cat['subcats'])) {
                 foreach ($cat['subcats'] as $subcat) {
-                    $network .= '<option value="' . $subcat->ID . '"' . (isset($info->catID) && $info->catID == $subcat->ID ? ' selected' : '') . '>' . ts($subcat->name) . '</option>';
+                    $network .= '<option value="' . $subcat->ID . '"' . (isset($info->netID) && $info->netID == $subcat->ID ? ' selected' : '') . '>' . ts($subcat->name) . '</option>';
                 }
             }
         }

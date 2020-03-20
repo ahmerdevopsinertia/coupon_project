@@ -695,8 +695,7 @@ public static function store_exists( $store_id = 0, $special = array() ) {
 /* GET INFORMATION ABOUT A STORE */
 
 public static function store_info( $store_id = 0, $special = array() ) {
-
-    global $db, $GET;
+  global $db, $GET;
 
     /** make or not seo links */
     $seo_link = defined( 'SEO_LINKS' ) && SEO_LINKS ? true : false;
@@ -711,13 +710,14 @@ public static function store_info( $store_id = 0, $special = array() ) {
         $stmt->execute();
     }
 
-    $stmt->prepare( "SELECT s.id, s.feedID, s.user, s.category, s.popular, s.physical, s.name, s.link, s.description, s.tags, s.image, s.hours, s.phoneno, s.sellonline, s.visible, s.views, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "coupons WHERE store = s.id AND visible > 0), s.url_title, s.meta_title, s.meta_keywords, s.meta_desc, s.lastupdate_by, (SELECT name FROM " . DB_TABLE_PREFIX . "users WHERE id = s.lastupdate_by), s.lastupdate, s.extra, s.date, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0), (SELECT AVG(stars) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "products WHERE store = s.id AND visible > 0), u.name FROM " . DB_TABLE_PREFIX . "stores s LEFT JOIN " . DB_TABLE_PREFIX . "users u ON (u.id = s.user) WHERE s.id = ? OR s.url_title = ?" );
+    $stmt->prepare( "SELECT s.network, s.id, s.feedID, s.user, s.category, s.popular, s.physical, s.name, s.link, s.description, s.tags, s.image, s.hours, s.phoneno, s.sellonline, s.visible, s.views,(SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "network WHERE store = s.id), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "coupons WHERE store = s.id AND visible > 0), s.url_title, s.meta_title, s.meta_keywords, s.meta_desc, s.lastupdate_by, (SELECT name FROM " . DB_TABLE_PREFIX . "users WHERE id = s.lastupdate_by), s.lastupdate, s.extra, s.date, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0), (SELECT AVG(stars) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "products WHERE store = s.id AND visible > 0), u.name FROM " . DB_TABLE_PREFIX . "stores s LEFT JOIN " . DB_TABLE_PREFIX . "users u ON (u.id = s.user) WHERE s.id = ? OR s.url_title = ?" );
     $stmt->bind_param( "is", $store_id, $store_id );
     $stmt->execute();
-    $stmt->bind_result( $id, $feed_id, $user, $cat, $popular, $physical, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $visible, $views, $coupons, $url_title, $meta_title, $meta_keywords, $meta_desc, $lastupdate_by, $lastupdate_by_name, $last_update, $extra, $date, $reviews, $stars, $products, $user_name);
+    $stmt->bind_result( $id, $feed_id, $user, $cat, $popular, $physical, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $visible, $views, $coupons, $url_title, $meta_title, $meta_keywords, $meta_desc, $lastupdate_by, $lastupdate_by_name, $last_update, $extra, $date, $reviews, $stars, $products, $user_name, $network);
     $stmt->fetch();
     $stmt->close();
 
+  
     $extension = \query\main::get_option( 'extension' );
 
     // special
@@ -726,7 +726,16 @@ public static function store_info( $store_id = 0, $special = array() ) {
     $useec = ( isset( $special['no_escape'] ) && $special['no_escape'] ) ? false : true;
     $usefl = ( isset( $special['no_filters'] ) && $special['no_filters'] ) ? false : true;
 
-    return (object) value_with_filter( 'store_info_values', array( 'ID' => $id, 'feedID' => $feed_id, 'userID' => $user, 'user_name' => esc_html( $user_name ), 'catID' => $cat, 'name' => \site\content::title( 'store_name_single', $name, $useem, $useec, $usefl ), 'url' => esc_html( $link ), 'description' => \site\content::content( 'store_single', $description,  $useem, $usesh, false, $useec, $usefl ), 'tags' => esc_html( $tags ), 'image' => esc_html( $image ), 'hours' => @unserialize( $hours ), 'phone_no' => esc_html( $phone ), 'sellonline' => (boolean) ( !$physical ? 1 : $sellonline ), 'sellonline2' => (boolean) $sellonline, 'visible' => (boolean) $visible, 'views' => $views, 'coupons' => $coupons, 'extra' => @unserialize( $extra ), 'date' => $date, 'reviews' => $reviews, 'stars' => $stars, 'products' => $products, 'meta_title' => esc_html( $meta_title ), 'meta_keywords' => esc_html( $meta_keywords ), 'meta_description' => esc_html( $meta_desc ), 'lastupdate_by' => $lastupdate_by, 'lastupdate_by_name' => esc_html( $lastupdate_by_name ), 'last_update' => $last_update, 'is_popular' => (boolean) $popular, 'is_physical' => (boolean) $physical, 'url_title' => esc_html( $url_title ), 'link' => ( $seo_link ? \site\utils::make_seo_link( \query\main::get_option( 'seo_link_store' ), $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?store=' . $id ), 'reviews_link' => ( $seo_link ? \site\utils::make_seo_link( \query\main::get_option( 'seo_link_reviews' ), $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?reviews=' . $id ) ) );
+    return (object) value_with_filter( 'store_info_values', array( 'ID' => $id, 'feedID' => $feed_id, 'userID' => $user, 'user_name' => esc_html( $user_name ), 'catID' => $cat, 'name' => \site\content::title( 'store_name_single', $name, $useem, $useec, $usefl ), 
+    'netID' => $network, 'name' => \site\content::title( 'store_name_single', $name, $useem, $useec, $usefl ),
+    'url' => esc_html( $link ), 'description' => \site\content::content( 'store_single', $description,  $useem, $usesh, false, $useec, $usefl ), 'tags' => esc_html( $tags ), 
+    'image' => esc_html( $image ), 'hours' => @unserialize( $hours ), 'phone_no' => esc_html( $phone ), 
+    'sellonline' => (boolean) ( !$physical ? 1 : $sellonline ), 'sellonline2' => (boolean) $sellonline, 'visible' => (boolean) $visible, 'views' => $views, 'coupons' => $coupons, 'extra' => @unserialize( $extra ), 
+    'date' => $date, 'reviews' => $reviews, 'stars' => $stars, 'products' => $products, 'meta_title' => esc_html( $meta_title ), 
+    'meta_keywords' => esc_html( $meta_keywords ), 'meta_description' => esc_html( $meta_desc ), 'lastupdate_by' => $lastupdate_by, 'lastupdate_by_name' => esc_html( $lastupdate_by_name ), 'last_update' => $last_update,
+    'is_popular' => (boolean) $popular, 'is_physical' => (boolean) $physical,
+    'url_title' => esc_html( $url_title ), 'link' => ( $seo_link ? \site\utils::make_seo_link( \query\main::get_option( 'seo_link_store' ), $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?store=' . $id ), 
+    'reviews_link' => ( $seo_link ? \site\utils::make_seo_link( \query\main::get_option( 'seo_link_reviews' ), $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?reviews=' . $id ) ) );
 
 }
 
