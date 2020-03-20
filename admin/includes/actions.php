@@ -362,7 +362,7 @@ public static function edit_store( $id, $opt = array() ) {
     $extra = \site\utils::array_sanitize( $opt['extra'] );
     $extra = @serialize( $extra );
 
-    $stmt->bind_param( "iiiisssssssiisssisii", $opt['user'], $opt['category'], $opt['popular'], $opt['type'], $opt['name'], $opt['url'], $opt['description'], $opt['tags'], $logo, $hours, $opt['phone'], $opt['sellonline'], $opt['publish'], $opt['meta_title'], $opt['meta_keywords'], $opt['meta_desc'], $GLOBALS['me']->ID, $extra, $id, $opt['network']);
+    $stmt->bind_param( "iiiisssssssiisssisii", $opt['user'], $opt['category'], $opt['popular'], $opt['type'], $opt['name'], $opt['url'], $opt['description'], $opt['tags'], $logo, $hours, $opt['phone'], $opt['sellonline'], $opt['publish'], $opt['meta_title'], $opt['meta_keywords'], $opt['meta_desc'], $GLOBALS['me']->ID, $extra, $opt['network'], $id);
     $execute = $stmt->execute();
 
     if( $execute && $store->is_physical && (int) $opt['type'] === 0 ) {
