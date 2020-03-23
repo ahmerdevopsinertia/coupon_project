@@ -154,6 +154,10 @@ switch ($_GET['action']) {
 <input type="hidden" name="field[8]" value="locations" />
 <input type="hidden" name="field[9]" value="phone" />
 <input type="hidden" name="csrf" value="' . $csrf . '" />
+<input type="hidden" name="field[10]" value="network" />
+<input type="hidden" name="field[11]" value="meta_title" />
+<input type="hidden" name="field[12]" value="meta_keywords" />
+<input type="hidden" name="field[13]" value="meta_desc" />
 <div class="twocols">
     <div>
         <button class="btn btn-important">' . t('button_import', "Import") . '</button>

@@ -252,12 +252,12 @@ public static function import_stores( $opt = array() ) {
 
     $type = 0;
     $sellonline = 1;
-    $name = $link = $description = $tags = $image = $hours = $phone = $locations = '';
+    $name = $link = $description = $tags = $image = $hours = $phone = $locations = $network = $meta_title = $meta_keywords = $meta_desc = '';
 
     /* */
 
     $stmt = $db->stmt_init();
-    $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "stores (user, category, physical, name, link, description, tags, image, hours, phoneno, sellonline, lastupdate_by, lastupdate, date) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())" );
+    $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "stores (user, category, physical, name, link, description, tags, image, hours, phoneno, sellonline, lastupdate_by, lastupdate, date, network, meta_title, meta_keywords, meta_desc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?)" );
 
     $cat = !empty( $opt['category'] ) ? (int) $opt['category'] : 0;
 
@@ -270,12 +270,10 @@ public static function import_stores( $opt = array() ) {
         if( $line === 0 && $opt['omit_first_line'] ) {
             $line++;
             continue;
-        }
-
+        }   
         foreach( $opt['fields'] as $k => $var ) {
             ${$var} = isset( $data[$k] ) ? $data[$k] : '';
         }
-
         /*
 
         If store URL isn't valid, omit that row.
@@ -299,8 +297,7 @@ public static function import_stores( $opt = array() ) {
             $error++;
             continue;
         }
-
-        $stmt->bind_param( "iiisssssssii", $GLOBALS['me']->ID, $cat, $type, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $GLOBALS['me']->ID );
+        $stmt->bind_param( "iiisssssssiiisss", $GLOBALS['me']->ID, $cat, $type, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $GLOBALS['me']->ID , $network, $meta_title, $meta_keywords, $meta_desc);
         $execute = $stmt->execute();
 
         if( !$execute ) {
