@@ -179,8 +179,6 @@ function value_with_filter($filter = '', $default = '', $extra = '')
             }
         }
         $default = implode(" ", $defaultArray);
-        echo $default;
-        echo "<br>";
     }
     return $default;
 }
