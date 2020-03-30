@@ -158,6 +158,7 @@ switch ($_GET['action']) {
 <input type="hidden" name="field[11]" value="meta_title" />
 <input type="hidden" name="field[12]" value="meta_keywords" />
 <input type="hidden" name="field[13]" value="meta_desc" />
+<input type="hidden" name="field[14]" value="url_title" />
 <div class="twocols">
     <div>
         <button class="btn btn-important">' . t('button_import', "Import") . '</button>
@@ -352,6 +353,8 @@ switch ($_GET['action']) {
                     'meta_desc'     => (isset($_POST['meta_desc']) ? $_POST['meta_desc'] : ''),
                     'extra'         => (isset($_POST['extra']) ? $_POST['extra'] : array()),
                     'network'       => (isset($_POST['network']) ? $_POST['network'] : 0),
+                    'url_title'     => strtolower( \site\utils::encodeurl( $_POST['name'] ) ),
+
                 ))
             ))) {
 

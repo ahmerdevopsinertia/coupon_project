@@ -205,13 +205,12 @@ public static function add_store( $opt = array() ) {
     // if( !ab_to( array( 'stores' => 'add' ) ) ) return false;
 
     $opt = \site\utils::array_map_recursive( 'trim', $opt );
-
     if( empty( $opt['name'] ) || ( $opt['type'] == 0 && empty( $opt['url'] ) ) ) {
         return false;
     }
 
     $stmt = $db->stmt_init();
-    $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "stores (feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, meta_title, meta_keywords, meta_desc, lastupdate_by, lastupdate, extra, date, network) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, NOW(), ?)" );
+    $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "stores (feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, meta_title, meta_keywords, meta_desc, lastupdate_by, lastupdate, extra, date, network, url_title) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), ?, NOW(), ?, ?)" );
 
     $feedID = isset( $opt['feedID'] ) ? $opt['feedID'] : 0;
     $logo = \site\images::upload( ( !empty( $opt['import_logo'] ) && !empty( $opt['logo_url'] ) && empty( $opt['logo']['name'] ) ? $opt['logo_url'] : $opt['logo'] ), 'logo_', array( 'path' => DIR . '/', 'current' => ( !empty( $opt['logo_url'] ) ? $opt['logo_url'] : '' ) ) );
@@ -219,7 +218,7 @@ public static function add_store( $opt = array() ) {
     $extra = \site\utils::array_sanitize( $opt['extra'] );
     $extra = @serialize( $extra );
 
-    $stmt->bind_param( "iiiiisssssssiisssisi", $feedID, $opt['user'], $opt['category'], $opt['popular'], $opt['type'], $opt['name'], $opt['url'], $opt['description'], $opt['tags'], $logo, $hours, $opt['phone'], $opt['sellonline'], $opt['publish'], $opt['meta_title'], $opt['meta_keywords'], $opt['meta_desc'], $GLOBALS['me']->ID, $extra, $opt['network']);
+    $stmt->bind_param( "iiiiisssssssiisssisis", $feedID, $opt['user'], $opt['category'], $opt['popular'], $opt['type'], $opt['name'], $opt['url'], $opt['description'], $opt['tags'], $logo, $hours, $opt['phone'], $opt['sellonline'], $opt['publish'], $opt['meta_title'], $opt['meta_keywords'], $opt['meta_desc'], $GLOBALS['me']->ID, $extra, $opt['network'], $opt['url_title']);
 
     if( $stmt->execute() ) {
         $insert_id = $stmt->insert_id;
@@ -239,7 +238,7 @@ public static function add_store( $opt = array() ) {
 public static function import_stores( $opt = array() ) {
 
     global $db;
-
+    $setName = '';
     if( !ab_to( array( 'stores' => 'import' ) ) ) return false;
 
     $opt = \site\utils::array_map_recursive( 'trim', $opt );
@@ -252,27 +251,35 @@ public static function import_stores( $opt = array() ) {
 
     $type = 0;
     $sellonline = 1;
-    $name = $link = $description = $tags = $image = $hours = $phone = $locations = $network = $meta_title = $meta_keywords = $meta_desc = '';
+    $name = $link = $description = $tags = $image = $hours = $phone = $locations = $network = $meta_title = $meta_keywords = $meta_desc = $url_title = '';
 
     /* */
 
     $stmt = $db->stmt_init();
-    $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "stores (user, category, physical, name, link, description, tags, image, hours, phoneno, sellonline, lastupdate_by, lastupdate, date, network, meta_title, meta_keywords, meta_desc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?)" );
+    $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "stores (user, category, physical, name, link, description, tags, image, hours, phoneno, sellonline, lastupdate_by, lastupdate, date, network, meta_title, meta_keywords, meta_desc, url_title) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW(), ?, ?, ?, ?, ?)" );
 
     $cat = !empty( $opt['category'] ) ? (int) $opt['category'] : 0;
 
     $success = $error = $line = 0;
-
     if ( ( $handle = fopen( $opt['file']['tmp_name'], 'r' ) ) !== false ) {
 
         while( ( $data = fgetcsv( $handle, 3000, ',' ) ) !== false ) {
-
+			
         if( $line === 0 && $opt['omit_first_line'] ) {
             $line++;
             continue;
         }   
         foreach( $opt['fields'] as $k => $var ) {
-            ${$var} = isset( $data[$k] ) ? $data[$k] : '';
+            if($var == 'name') {
+                $setName = $data[$k];
+						}
+						
+            if($var == 'url_title'){
+							${$var} = strtolower( \site\utils::encodeurl( $setName ) );
+            }
+            else {
+                ${$var} = isset( $data[$k] ) ? $data[$k] : '';
+            }
         }
         /*
 
@@ -296,8 +303,9 @@ public static function import_stores( $opt = array() ) {
         if( $count > 0 ) {
             $error++;
             continue;
-        }
-        $stmt->bind_param( "iiisssssssiiisss", $GLOBALS['me']->ID, $cat, $type, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $GLOBALS['me']->ID , $network, $meta_title, $meta_keywords, $meta_desc);
+				}
+			
+        $stmt->bind_param( "iiisssssssiiissss", $GLOBALS['me']->ID, $cat, $type, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $GLOBALS['me']->ID , $network, $meta_title, $meta_keywords, $meta_desc, $url_title);
         $execute = $stmt->execute();
 
         if( !$execute ) {
