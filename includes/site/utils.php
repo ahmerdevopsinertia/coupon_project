@@ -97,14 +97,23 @@ class utils
 
     public static function make_seo_link($dir = '', $name = '', $custom_url = '', $id = '', $extension = '.html')
     {
-        if (!empty($custom_url)) {
-            return $GLOBALS['siteURL'] . (!empty($dir) ? $dir . '/' : '') . $custom_url . $extension;
-        } else if (!empty($name)) {
-            // return $GLOBALS['siteURL'] . ( !empty( $dir ) ? $dir . '/' : '' ) . strtolower( self::encodeurl( $name  ) ) . ( !empty( $id ) ? '-' . $id : '' ) . $extension;
-            return $GLOBALS['siteURL'] . (!empty($dir) ? $dir . '/' : '') . strtolower(self::encodeurl($name)) . $extension;
-        }
+        if ($dir == 'store') {
+            if (!empty($custom_url)) {
+                return $GLOBALS['siteURL'] . (!empty($dir) ? $dir . '/' : '') . $custom_url . $extension;
+            } else if (!empty($name)) {
+                return $GLOBALS['siteURL'] . (!empty($dir) ? $dir . '/' : '') . strtolower(self::encodeurl($name)) . $extension;
+            }
 
-        return $GLOBALS['siteURL'] . (!empty($dir) ? $dir : '') . '/';
+            return $GLOBALS['siteURL'] . (!empty($dir) ? $dir : '') . '/';
+        } else {
+            if (!empty($custom_url)) {
+                return $GLOBALS['siteURL'] . (!empty($dir) ? $dir . '/' : '') . $custom_url . $extension;
+            } else if (!empty($name)) {
+                return $GLOBALS['siteURL'] . (!empty($dir) ? $dir . '/' : '') . strtolower(self::encodeurl($name)) . (!empty($id) ? '-' . $id : '') . $extension;
+            }
+
+            return $GLOBALS['siteURL'] . (!empty($dir) ? $dir : '') . '/';
+        }
     }
 
     public static function make_template_seo_link($dir = '', $name = '', $custom_url = '', $id = '', $extension = '.html')

@@ -3,7 +3,7 @@
 <div class="bgGray">
     <div class="hero-title">
         <div class="container">
-            <h2><?php echo $posts as $post; ?></h2>
+            <h2><?php echo $post->title; ?></h2>
         </div>
     </div>
 </div>
