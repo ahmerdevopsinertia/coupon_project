@@ -1,0 +1,3 @@
+Version: 1.0
+Published by: CouponsCMS http://couponscms.com
+Description: Slick Coupon Theme for CouponsCMS v7.00

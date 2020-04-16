@@ -1,0 +1,178 @@
+html, body, ul, li, form, h1, h2, h3, p {
+    margin:0;
+    padding:0;
+    border:0;
+}
+
+body {
+    background-color: #f1f1f1;
+    font-family: "Open Sans", sans-serif;
+    color: #333;
+    font-size: 15px;
+}
+
+html, body, #wrap, .main-nav, .page-content {
+    height: 100%;
+    min-height: 100%;
+}
+
+a {
+    text-decoration: none;
+    font-size: 12px;
+}
+
+ul {
+    list-style-type: none;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+ul li .info {
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 12px;
+    padding: 5px;
+    margin-top: 10px;
+    border: 1px solid #e5e5e5;
+}
+
+ul li.green {
+    color: rgb(67, 167, 48);
+}
+
+ul li.red {
+    color: rgb(179, 24, 24);
+}
+
+#install {
+    margin:40px auto;
+}
+
+#install > .wrapper {
+    width: 400px;
+    background: #FFF;
+    padding: 25px 20px;
+    margin: 0 auto;
+    border: 1px solid #e6e6e6;
+    box-shadow: 0 6px 16px 6px #e6e6e6;
+    -webkit-box-shadow: 0 6px 16px 6px #e6e6e6;
+}
+
+input, select, label {
+    display: block;
+}
+
+input, select {
+    width: 100%;
+    color: #e14d43;
+    border: 1px solid #E5E5E5;
+    padding: 5px 3px;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    transition-duration: 0.35s;
+    -webkit-transition-duration: 0.35s;
+}
+
+input:focus, select:focus {
+    border: 1px solid #5B9DD9;
+    box-shadow: rgba(30, 140, 190, 0.804) 0px 0px 2px 0px;
+    -webkit-box-shadow: rgba(30, 140, 190, 0.804) 0px 0px 2px 0px;
+    transition-duration: 0.35s;
+    -webkit-transition-duration: 0.35s;
+}
+
+input[type="checkbox"] {
+    width: auto;
+    margin: 0!important;
+}
+
+input[type="checkbox"] + label {
+    line-height: normal!important;
+}
+
+button {
+    border: 0;
+    cursor: pointer;
+    color: #FFF;
+    background: #26292c;
+    padding: 10px 15px;
+    margin-top: 10px;
+    transition-duration: 0.35s;
+    -webkit-transition-duration: 0.35s;
+}
+
+button:hover {
+    background: #e14d43;
+    transition-duration: 0.35s;
+    -webkit-transition-duration: 0.35s;
+}
+
+#install .links {
+    width: 400px;
+    margin: 15px auto;
+}
+
+#install .links > a {
+    color: #e14d43;
+}
+
+#install .links > a:hover {
+    text-decoration: underline;
+}
+
+#install label {
+    cursor: pointer;
+    font-size: 13px;
+    line-height: 30px;
+    padding-left: 5px;
+}
+
+#install .success, #install .error {
+    color: #000;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 5px;
+    margin-bottom: 10px;
+}
+
+#install .success {
+    background: #81F781;
+}
+
+#install .error {
+    background: #FC8080;
+}
+
+#install h2 {
+    font-size: 16px;
+    line-height: 40px;
+    text-align: center;
+}
+
+#install h2:not(:first-child) {
+    margin-top: 20px;
+}
+
+.table {
+    display: table;
+}
+
+.table-cell {
+    display: table-cell;
+}
+
+@media (max-width: 750px){
+
+    #install > .wrapper {
+        width: 95%;
+        box-sizing: border-box;
+    }
+
+    #install > .links {
+        width: 90%;
+        box-sizing: border-box;
+    }
+
+}

@@ -1,0 +1,3 @@
+added seo_network data inside options table = done at production
+added network table = done at production
+added network field insdie the stores table = done at production
