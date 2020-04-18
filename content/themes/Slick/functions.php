@@ -25,6 +25,7 @@ add( 'styles', THEME_LOCATION . '/style.css',                           [ 'media
 add( 'styles', THEME_LOCATION . '/assets/css/couponscms.css',           [ 'media' => 'all', 'rel' => 'stylesheet' ] );
 add( 'styles', THEME_LOCATION . '/assets/css/responsive.css',           [ 'media' => 'all', 'rel' => 'stylesheet' ] );
 add( 'styles', THEME_LOCATION . '/assets/css/owl.carousel.min.css',     [ 'media' => 'all', 'rel' => 'stylesheet' ] );
+add( 'styles', THEME_LOCATION . '/assets/css/rating.css',           [ 'media' => 'all', 'rel' => 'stylesheet' ] );
 add( 'styles', '//fonts.googleapis.com/css?family=Quicksand:500,700',   [ 'rel' => 'stylesheet' ] );
 
 /* ADD THEME SCRIPTS */
@@ -32,6 +33,7 @@ add( 'scripts', '//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js' );
 add( 'scripts', THEME_LOCATION . '/assets/js/functions.js' );
 add( 'scripts', THEME_LOCATION . '/assets/js/ajax.js' );
 add( 'scripts', THEME_LOCATION . '/assets/js/owl.carousel.min.js' );
+add( 'scripts', THEME_LOCATION . '/assets/js/rating.js' );
 
 /* USE OR DON'T USE REWARDS */
 function theme_has_rewards() {

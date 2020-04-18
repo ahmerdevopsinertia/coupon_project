@@ -67,6 +67,13 @@ class utils
         return preg_replace('!__+!', '_', rtrim($clean, '_'));
     }
 
+    //Override by Ahmer
+    public static function clear_name_with_hyphen($name)
+    {
+        $clean = preg_replace('/[^a-z0-9-]/i', '', str_replace(' ', '-', $name));
+        return preg_replace('!--+!', '-', rtrim($clean, '-'));
+    }
+
     public static function encodeurl($url)
     {
         //cyrylic transcription
@@ -79,7 +86,7 @@ class utils
         $from   = array_merge($from, $cyrylicFrom);
         $to     = array_merge($to, $cyrylicTo);
 
-        return self::clear_name(str_replace($from, $to, $url));
+        return self::clear_name_with_hyphen(str_replace($from, $to, $url));
     }
 
     public static function money_format($money)
