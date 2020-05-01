@@ -293,8 +293,8 @@ public static function import_stores( $opt = array() ) {
         }
 
         $stmt2 = $db->stmt_init();
-        $stmt2->prepare( "SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "stores WHERE name = ? OR link = ?" );
-        $stmt2->bind_param( "ss", $name, $link );
+        $stmt2->prepare( "SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "stores WHERE name = ?" );
+        $stmt2->bind_param( "s", $name);
         $stmt2->execute();
         $stmt2->bind_result( $count );
         $stmt2->fetch();
