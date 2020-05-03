@@ -10,7 +10,7 @@ function couponscms_store_item( $item = object, $owner_view = false ) {
     <div class="item">
         ' . do_action( 'before_store_inside', $item ) . '
         <div class="image">
-        <img src="' . store_avatar( $item->image ) . '" alt="' . ts( $item->name ) . '" />
+        '. ($item->image != NULL ? '<img src="' . store_avatar( $item->image ) . '" alt="' . ts( $item->name ) . '" />' : '<div style="margin: 18px;">'.$item->name.'</div>').'
         </div>
         <div class="bottom clearfix">
             <a href="' . $item->link . '">' . ts( $item->name ) . '</a>';

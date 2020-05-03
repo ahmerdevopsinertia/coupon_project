@@ -42,7 +42,11 @@ $type = searched_type(); ?>
         <div class="row">
             <div class="col-lg-3 col-md-4">
                 <div class="store-logo text-center">
-                    <img src="<?php echo store_avatar((!empty($store->image) ? $store->image : '')); ?>" alt="<?php tse($store->name); ?>" />
+                    <?php if (empty($store->image)) { ?>
+                        <div><?php echo $store->name; ?></div>
+                    <?php } else { ?>
+                        <img src="<?php echo store_avatar((!empty($store->image) ? $store->image : '')); ?>" alt="<?php tse($store->name); ?>" />
+                    <?php } ?>
                     <a href="<?php echo $store->reviews_link; ?>"><?php echo couponscms_rating((int) $store->stars, $store->reviews); ?></a>
                 </div>
                 <div class="button-set">
