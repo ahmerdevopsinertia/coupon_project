@@ -2975,87 +2975,86 @@ class main
 
     /* FETCH THE STORES */
 
-    public static function while_stores($category = array(), $place = '', $special = array())
-    {
+    public static function while_stores( $category = array(), $place = '', $special = array() ) {
 
         global $db, $GET;
-
+    
         /** make or not seo links */
-        $seo_link = defined('SEO_LINKS') && SEO_LINKS ? true : false;
-        list($seo_link_store, $seo_link_reviews, $extension) = array(\query\main::get_option('seo_link_store'), \query\main::get_option('seo_link_reviews'), \query\main::get_option('extension'));
-
-        $categories = \site\utils::validate_user_data($category);
-
+        $seo_link = defined( 'SEO_LINKS' ) && SEO_LINKS ? true : false;
+        list( $seo_link_store, $seo_link_reviews, $extension ) = array( \query\main::get_option( 'seo_link_store' ), \query\main::get_option( 'seo_link_reviews' ), \query\main::get_option( 'extension' ) );
+    
+        $categories = \site\utils::validate_user_data( $category );
+    
         $where = $orderby = $limit = array();
-
-        if (isset($categories['max'])) {
-            if (!empty($categories['max'])) {
+    
+        if( isset( $categories['max'] ) ) {
+            if( !empty( $categories['max'] ) ) {
                 $limit[] = $categories['max'];
             }
         } else {
-            $page = (!empty($categories['page']) ? (int) $categories['page'] : (!empty($_GET['page']) ? (int) $_GET['page'] : 1));
-            $per_page = (isset($categories['per_page']) ? (int) $categories['per_page'] : \query\main::get_option('items_per_page'));
-            $offset = isset($page) && $page > 1 ? ($page - 1) * $per_page : 0;
-
+            $page = ( !empty( $categories['page'] ) ? (int) $categories['page'] : ( !empty( $_GET['page'] ) ? (int) $_GET['page'] : 1 ) );
+            $per_page = ( isset( $categories['per_page'] ) ? (int) $categories['per_page'] : \query\main::get_option( 'items_per_page' ) );
+            $offset = isset( $page ) && $page > 1 ? ( $page - 1 ) * $per_page : 0;
+    
             $limit[] = $offset;
-            $limit[] = isset($categories['limit']) && ($offset + $per_page) > $categories['limit'] ? (($limit2 = ($categories['limit'] - $per_page)) > 0 ? $limit2 : $categories['limit']) : $per_page;
+            $limit[] = isset( $categories['limit'] ) && ( $offset + $per_page ) > $categories['limit'] ? ( ( $limit2 = ( $categories['limit'] - $per_page ) ) > 0 ? $limit2 : $categories['limit'] ) : $per_page;
         }
-
+    
         /* WHERE / ORDER BY */
-
-        if (isset($categories['firstchar']) && preg_match('/(^[\p{L}]$|^[0-9]$)/u', $categories['firstchar'])) {
-            $where[] = 'name REGEXP "^' . (is_numeric($categories['firstchar'][0]) ? '[0-9]' : \site\utils::dbp($categories['firstchar'])) . '"';
+    
+        if( isset( $categories['firstchar'] ) && preg_match( '/(^[\p{L}]$|^[0-9]$)/u', $categories['firstchar'] ) ) {
+            $where[] = 'name REGEXP "^' . ( is_numeric( $categories['firstchar'][0] ) ? '[0-9]' : \site\utils::dbp( $categories['firstchar'] ) ) . '"';
         }
-
-        if (!empty($categories['categories']) && strcasecmp($categories['categories'], 'all') != 0) {
-            $arr = array_filter(array_map(function ($w) {
+    
+        if( !empty( $categories['categories'] ) && strcasecmp( $categories['categories'], 'all' ) != 0 ) {
+            $arr = array_filter( array_map( function( $w ){
                 return (int) $w;
-            }, explode(',', $categories['categories'])));
-            if (!empty($arr))
-                $where[] = 'category IN(' . \site\utils::dbp(implode(',', $arr)) . ')';
-            if (!isset($categories['orderby'])) {
-                $orderby[] = 'field(id,' . \site\utils::dbp(implode(',', $arr)) . ')';
+            }, explode( ',', $categories['categories'] ) ));
+            if( !empty( $arr ) )
+            $where[] = 'category IN(' . \site\utils::dbp( implode(',', $arr) ) . ')';
+            if( !isset( $categories['orderby'] ) ) {
+                $orderby[] = 'field(id,' . \site\utils::dbp( implode(',', $arr) ) . ')';
             }
         }
-
-        if (!empty($categories['update'])) {
-            $date = array_map('trim', explode(',', $categories['update']));
-            $where[] = 'update >= FROM_UNIXTIME(' . \site\utils::dbp($date[0]) . ')';
-            if (isset($date[1])) {
-                $where[] = 'update <= FROM_UNIXTIME(' . \site\utils::dbp($date[1]) . ')';
+    
+        if( !empty( $categories['update'] ) ) {
+            $date = array_map( 'trim', explode( ',', $categories['update'] ) );
+            $where[] = 'update >= FROM_UNIXTIME(' . \site\utils::dbp( $date[0] ) . ')';
+            if( isset( $date[1] ) ) {
+                $where[] = 'update <= FROM_UNIXTIME(' . \site\utils::dbp( $date[1] ) . ')';
             }
         }
-
-        if (!empty($categories['date'])) {
-            $date = array_map('trim', explode(',', $categories['date']));
-            $where[] = 'date >= FROM_UNIXTIME(' . \site\utils::dbp($date[0]) . ')';
-            if (isset($date[1])) {
-                $where[] = 'date <= FROM_UNIXTIME(' . \site\utils::dbp($date[1]) . ')';
+    
+        if( !empty( $categories['date'] ) ) {
+            $date = array_map( 'trim', explode( ',', $categories['date'] ) );
+            $where[] = 'date >= FROM_UNIXTIME(' . \site\utils::dbp( $date[0] ) . ')';
+            if( isset( $date[1] ) ) {
+                $where[] = 'date <= FROM_UNIXTIME(' . \site\utils::dbp( $date[1] ) . ')';
             }
         }
-
-        if (isset($categories['show'])) {
-            $show = array_map('trim', explode(',', strtolower($categories['show'])));
-            $custom_where_clause = value_with_filter('stores_where_clause', array(
+    
+        if( isset( $categories['show'] ) ) {
+            $show = array_map( 'trim', explode( ',', strtolower( $categories['show'] ) ) );
+            $custom_where_clause = value_with_filter( 'stores_where_clause', array(
                 'physical'  => 'physical > 0',
                 'online'    => 'physical = 0',
                 'popular'   => 'popular > 0',
                 'feed'      => 'feedID > 0',
                 'visible'   => 'visible > 0',
-                'notvisible' => 'visible = 0'
-            ));
-            foreach ($show as $v) {
-                if (!empty($custom_where_clause) && in_array($v, array_keys($custom_where_clause))) {
+                'notvisible'=> 'visible = 0'
+            ) );
+            foreach( $show as $v ) {
+                if( !empty( $custom_where_clause ) && in_array( $v, array_keys( $custom_where_clause ) ) ) {
                     $where[] = $custom_where_clause[$v];
                 }
             }
         } else {
             $where[] = 'visible > 0';
         }
-
-        if (isset($categories['orderby'])) {
-            $order = array_map('trim', explode(',', strtolower($categories['orderby'])));
-            $custom_orderby_clause = value_with_filter('stores_orderby_clause', array(
+    
+        if( isset( $categories['orderby'] ) ) {
+            $order = array_map( 'trim', explode( ',', strtolower( $categories['orderby'] ) ) );
+            $custom_orderby_clause = value_with_filter( 'stores_orderby_clause', array(
                 'rand'          => 'RAND()',
                 'name'          => 'name',
                 'name desc'     => 'name DESC',
@@ -3069,143 +3068,172 @@ class main
                 'views desc'    => 'views DESC',
                 'date'          => 'date',
                 'date desc'     => 'date DESC'
-            ));
-
-            foreach ($order as $v) {
-                if (!empty($custom_orderby_clause) && in_array($v, array_keys($custom_orderby_clause))) {
+            ) );
+    
+            foreach( $order as $v ) {
+                if( !empty( $custom_orderby_clause ) && in_array( $v, array_keys( $custom_orderby_clause ) ) ) {
                     $orderby[] = $custom_orderby_clause[$v];
                 }
             }
         }
-
+    
         // special
-        $useem = (isset($special['no_emoticons']) && $special['no_emoticons']) ? false : (bool) \query\main::get_option('smilies_stores');
-        $usesh = (isset($special['no_shortcodes']) && $special['no_shortcodes']) ? false : true;
-        $useec = (isset($special['no_escape']) && $special['no_escape']) ? false : true;
-        $usefl = (isset($special['no_filters']) && $special['no_filters']) ? false : true;
-
+        $useem = ( isset( $special['no_emoticons'] ) && $special['no_emoticons'] ) ? false : (boolean) \query\main::get_option( 'smilies_stores' );
+        $usesh = ( isset( $special['no_shortcodes'] ) && $special['no_shortcodes'] ) ? false : true;
+        $useec = ( isset( $special['no_escape'] ) && $special['no_escape'] ) ? false : true;
+        $usefl = ( isset( $special['no_filters'] ) && $special['no_filters'] ) ? false : true;
+    
         /* */
-
-        switch ($place) {
-
-            case 'category':
-
-                $stmt = $db->stmt_init();
-                $stmt->prepare("SELECT id FROM " . DB_TABLE_PREFIX . "categories WHERE subcategory = ?");
-                $stmt->bind_param("i", $GET['id']);
-                $stmt->execute();
-                $stmt->bind_result($id);
-
-                $ids = array();
-                $ids[] = (int) $GET['id'];
-                while ($stmt->fetch()) {
-                    $ids[] = $id;
-                }
-
-                $stmt->prepare("SELECT id, feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, views, url_title, extra, date, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as votes, (SELECT AVG(stars) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as rating, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "coupons WHERE store = s.id AND visible > 0), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "products WHERE store = s.id AND visible > 0) FROM " . DB_TABLE_PREFIX . "stores s  WHERE category IN(" . implode(',', $ids) . ") AND visible > 0" . (empty($where) ? '' : ' AND ' . implode(' AND ', array_filter($where))) . (empty($orderby) ? '' : ' ORDER BY ' . implode(', ', array_filter($orderby))) . (empty($limit) ? '' : ' LIMIT ' . implode(',', $limit)));
-                $stmt->execute();
-                $stmt->bind_result($id, $feed_id, $user, $cat, $popular, $physical, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $visible, $views, $url_title, $extra, $date, $reviews, $stars, $coupons, $products);
-
-                $data = array();
-                while ($stmt->fetch()) {
-
-                    $data[] = (object) value_with_filter('store_info_values', array('ID' => $id, 'feedID' => $feed_id, 'userID' => $user, 'catID' => $cat, 'name' => \site\content::title('stores_name_list', $name, $useem, $useec, $usefl), 'url' => esc_html($link), 'description' => \site\content::content('stores_list', $description, $useem, $usesh, false, $useec, $usefl), 'tags' => esc_html($tags), 'image' => esc_html($image), 'hours' => @unserialize($hours), 'phone_no' => esc_html($phone), 'sellonline' => (bool) (!$physical ? 1 : $sellonline), 'sellonline2' => (bool) $sellonline, 'extra' => @unserialize($extra), 'date' => $date, 'visible' => (bool) $visible, 'views' => $views, 'reviews' => $reviews, 'stars' => $stars, 'coupons' => $coupons, 'products' => $products, 'is_popular' => (bool) $popular, 'is_physical' => (bool) $physical, 'url_title' => esc_html($url_title), 'link' => ($seo_link ? \site\utils::make_seo_link($seo_link_store, $name, $url_title, $id, $extension) : $GLOBALS['siteURL'] . '?store=' . $id), 'reviews_link' => ($seo_link ? \site\utils::make_seo_link($seo_link_reviews, $name, $url_title, $id, $extension) : $GLOBALS['siteURL'] . '?reviews=' . $id)));
-                }
-
-                $stmt->close();
-
-                return $data;
-
-                break;
-
-            case 'search':
-
-                $stmt = $db->stmt_init();
-
-                $ids = array();
-
-                if (!empty($_GET['category'])) {
-                    $stmt->prepare("SELECT id FROM " . DB_TABLE_PREFIX . "categories WHERE subcategory = ?");
-                    $stmt->bind_param("i", $_GET['category']);
-                    $stmt->execute();
-                    $stmt->bind_result($id);
-
-                    $ids[] = (int) $_GET['category'];
-                    while ($stmt->fetch()) {
-                        $ids[] = $id;
-                    }
-
-                    $where[] = 'category IN(' . implode(',', $ids) . ')';
-                }
-
-                $stmt->prepare("SELECT id, feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, views, url_title, extra, date, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as votes, (SELECT AVG(stars) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as rating, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "coupons WHERE store = s.id AND visible > 0), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "products WHERE store = s.id AND visible > 0) FROM " . DB_TABLE_PREFIX . "stores s WHERE (MATCH(name) AGAINST (? IN BOOLEAN MODE) OR MATCH(tags) AGAINST (? IN BOOLEAN MODE)) AND visible > 0" . (empty($where) ? '' : ' AND ' . implode(' AND ', array_filter($where))) . (empty($orderby) ? '' : ' ORDER BY ' . implode(', ', array_filter($orderby))) . (empty($limit) ? '' : ' LIMIT ' . implode(',', $limit)));
-
-                if (gettype($GET['id']) === 'string') {
-                    $search = implode('+', explode(' ', trim($GET['id'])));
-                    $search = substr($search, 0, 50);
-                } else {
-                    $search = '';
-                }
-
-                $stmt->bind_param("ss", $search, $search);
-                $stmt->execute();
-                $stmt->bind_result($id, $feed_id, $user, $cat, $popular, $physical, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $visible, $views, $url_title, $extra, $date, $reviews, $stars, $coupons, $products);
-
-                $data = array();
-                while ($stmt->fetch()) {
-
-                    $data[] = (object) value_with_filter('store_info_values', array('ID' => $id, 'feedID' => $feed_id, 'userID' => $user, 'catID' => $cat, 'name' => \site\content::title('stores_name_list', $name, $useem, $useec, $usefl), 'url' => esc_html($link), 'description' => \site\content::content('stores_list', $description, $useem, $usesh, false, $useec, $usefl), 'tags' => esc_html($tags), 'image' => esc_html($image), 'hours' => @unserialize($hours), 'phone_no' => esc_html($phone), 'sellonline' => (bool) (!$physical ? 1 : $sellonline), 'sellonline2' => (bool) $sellonline, 'extra' => @unserialize($extra), 'date' => $date, 'visible' => (bool) $visible, 'views' => $views, 'reviews' => $reviews, 'stars' => $stars, 'coupons' => $coupons, 'products' => $products, 'is_popular' => (bool) $popular, 'is_physical' => (bool) $physical, 'url_title' => esc_html($url_title), 'link' => ($seo_link ? \site\utils::make_seo_link($seo_link_store, $name, $url_title, $id, $extension) : $GLOBALS['siteURL'] . '?store=' . $id), 'reviews_link' => ($seo_link ? \site\utils::make_seo_link($seo_link_reviews, $name, $url_title, $id, $extension) : $GLOBALS['siteURL'] . '?reviews=' . $id)));
-                }
-
-                $stmt->close();
-
-                return $data;
-
-                break;
-
-            default:
-
-                /* WHERE / ORDER BY */
-
-                if (!empty($categories['user'])) {
-                    $where[] = 'user = "' . (int) $categories['user'] . '"';
-                }
-
-                if (!empty($categories['ids']) && strcasecmp($categories['ids'], 'all') != 0) {
-                    $arr = array_filter(array_map(function ($w) {
-                        return (int) $w;
-                    }, explode(',', $categories['ids'])));
-                    if (!empty($arr))
-                        $where[] = 'id IN(' . \site\utils::dbp(implode(',', $arr)) . ')';
-                    if (!isset($categories['orderby'])) {
-                        $orderby[] = 'field(id,' . \site\utils::dbp(implode(',', $arr)) . ')';
-                    }
-                }
-
-                if (!empty($categories['search'])) {
-                    $search = implode('.*', explode(' ', trim($categories['search'])));
-                    $where[] = 'CONCAT(name, tags) REGEXP "' . \site\utils::dbp($search) . '"';
-                }
-
-                /* */
-
-                $stmt = $db->stmt_init();
-                $stmt->prepare("SELECT id, feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, views, url_title, extra, date, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as votes, (SELECT AVG(stars) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as rating, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "coupons WHERE store = s.id AND visible > 0), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "products WHERE store = s.id AND visible > 0) FROM " . DB_TABLE_PREFIX . "stores s" . (empty($where) ? '' : ' WHERE ' . implode(' AND ', array_filter($where))) . (empty($orderby) ? '' : ' ORDER BY ' . implode(', ', array_filter($orderby))) . (empty($limit) ? '' : ' LIMIT ' . implode(',', $limit)));
-                $stmt->execute();
-                $stmt->bind_result($id, $feed_id, $user, $cat, $popular, $physical, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $visible, $views, $url_title, $extra, $date, $reviews, $stars, $coupons, $products);
-
-                $data = array();
-                while ($stmt->fetch()) {
-
-                    $data[] = (object) value_with_filter('store_info_values', array('ID' => $id, 'feedID' => $feed_id, 'userID' => $user, 'catID' => $cat, 'name' => \site\content::title('stores_name_list', $name, $useem, $useec, $usefl), 'url' => esc_html($link), 'description' => \site\content::content('stores_list', $description, $useem, $usesh, false, $useec, $usefl), 'tags' => esc_html($tags), 'image' => esc_html($image), 'hours' => @unserialize($hours), 'phone_no' => esc_html($phone), 'sellonline' => (bool) (!$physical ? 1 : $sellonline), 'sellonline2' => (bool) $sellonline, 'extra' => @unserialize($extra), 'date' => $date, 'visible' => (bool) $visible, 'views' => $views, 'reviews' => $reviews, 'stars' => $stars, 'coupons' => $coupons, 'products' => $products, 'is_popular' => (bool) $popular, 'is_physical' => (bool) $physical, 'url_title' => esc_html($url_title), 'link' => ($seo_link ? \site\utils::make_seo_link($seo_link_store, $name, $url_title, $id, $extension) : $GLOBALS['siteURL'] . '?store=' . $id), 'reviews_link' => ($seo_link ? \site\utils::make_seo_link($seo_link_reviews, $name, $url_title, $id, $extension) : $GLOBALS['siteURL'] . '?reviews=' . $id)));
-                }
-
-                $stmt->close();
-
-                return $data;
-
-                break;
+    
+        switch( $place ) {
+    
+        case 'category':
+    
+        $stmt = $db->stmt_init();
+        $stmt->prepare( "SELECT id FROM " . DB_TABLE_PREFIX . "categories WHERE subcategory = ?" );
+        $stmt->bind_param( "i", $GET['id'] );
+        $stmt->execute();
+        $stmt->bind_result( $id );
+    
+        $ids = array();
+        $ids[] = (int) $GET['id'];
+        while( $stmt->fetch() ) {
+            $ids[] = $id;
         }
+    
+        $stmt->prepare( "SELECT id, feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, views, url_title, extra, date, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as votes, (SELECT AVG(stars) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as rating, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "coupons WHERE store = s.id AND visible > 0), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "products WHERE store = s.id AND visible > 0) FROM " . DB_TABLE_PREFIX . "stores s  WHERE category IN(" . implode( ',', $ids ) . ") AND visible > 0" . ( empty( $where ) ? '' : ' AND ' . implode( ' AND ', array_filter( $where ) ) ) . ( empty( $orderby ) ? '' : ' ORDER BY ' . implode( ', ', array_filter( $orderby ) ) ) . ( empty( $limit ) ? '' : ' LIMIT ' . implode( ',', $limit ) ) );
+        $stmt->execute();
+        $stmt->bind_result( $id, $feed_id, $user, $cat, $popular, $physical, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $visible, $views, $url_title, $extra, $date, $reviews, $stars, $coupons, $products );
+    
+        $data = array();
+        while( $stmt->fetch() ) {
+    
+            $data[] = (object) value_with_filter( 'store_info_values', array( 'ID' => $id, 'feedID' => $feed_id, 'userID' => $user, 'catID' => $cat, 'name' => \site\content::title( 'stores_name_list', $name, $useem, $useec, $usefl ), 'url' => esc_html( $link ), 'description' => \site\content::content( 'stores_list', $description, $useem, $usesh, false, $useec, $usefl ), 'tags' => esc_html( $tags ), 'image' => esc_html( $image ), 'hours' => @unserialize( $hours ), 'phone_no' => esc_html( $phone ), 'sellonline' => (boolean) ( !$physical ? 1 : $sellonline ), 'sellonline2' => (boolean) $sellonline, 'extra' => @unserialize( $extra ), 'date' => $date, 'visible' => (boolean) $visible, 'views' => $views, 'reviews' => $reviews, 'stars' => $stars, 'coupons' => $coupons, 'products' => $products, 'is_popular' => (boolean) $popular, 'is_physical' => (boolean) $physical, 'url_title' => esc_html( $url_title ), 'link' => ( $seo_link ? \site\utils::make_seo_link( $seo_link_store, $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?store=' . $id ), 'reviews_link' => ( $seo_link ? \site\utils::make_seo_link( $seo_link_reviews, $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?reviews=' . $id ) ) );
+    
+        }
+    
+        $stmt->close();
+    
+        return $data;
+    
+        break;
+    
+        case 'search':
+    
+        $stmt = $db->stmt_init();
+    
+        $ids = array();
+    
+        if( !empty( $_GET['category'] ) ) {
+            $stmt->prepare( "SELECT id FROM " . DB_TABLE_PREFIX . "categories WHERE subcategory = ?" );
+            $stmt->bind_param( "i", $_GET['category'] );
+            $stmt->execute();
+            $stmt->bind_result( $id );
+    
+            $ids[] = (int) $_GET['category'];
+            while( $stmt->fetch() ) {
+                $ids[] = $id;
+            }
+    
+            $where[] = 'category IN(' . implode( ',', $ids ) . ')';
+        }
+    
+        $stmt->prepare( "SELECT id, feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, views, url_title, extra, date, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as votes, (SELECT AVG(stars) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as rating, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "coupons WHERE store = s.id AND visible > 0), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "products WHERE store = s.id AND visible > 0) FROM " . DB_TABLE_PREFIX . "stores s WHERE (MATCH(name) AGAINST (? IN BOOLEAN MODE) OR MATCH(tags) AGAINST (? IN BOOLEAN MODE)) AND visible > 0" . ( empty( $where ) ? '' : ' AND ' . implode( ' AND ', array_filter( $where ) ) ) . ( empty( $orderby ) ? '' : ' ORDER BY ' . implode( ', ', array_filter( $orderby ) ) ) . ( empty( $limit ) ? '' : ' LIMIT ' . implode( ',', $limit ) ) );
+    
+        if( gettype( $GET['id'] ) === 'string' ) {
+            $search = implode( '+', explode( ' ', trim( $GET['id'] ) ) );
+            $search = substr( $search, 0, 50 );
+        } else {
+            $search = '';
+        }
+    
+        $stmt->bind_param( "ss", $search, $search );
+        $stmt->execute();
+        $stmt->bind_result( $id, $feed_id, $user, $cat, $popular, $physical, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $visible, $views, $url_title, $extra, $date, $reviews, $stars, $coupons, $products );
+    
+        $data = array();
+        while( $stmt->fetch() ) {
+    
+            $data[] = (object) value_with_filter( 'store_info_values', array( 'ID' => $id, 'feedID' => $feed_id, 'userID' => $user, 'catID' => $cat, 'name' => \site\content::title( 'stores_name_list', $name, $useem, $useec, $usefl ), 'url' => esc_html( $link ), 'description' => \site\content::content( 'stores_list', $description, $useem, $usesh, false, $useec, $usefl ), 'tags' => esc_html( $tags ), 'image' => esc_html( $image ), 'hours' => @unserialize( $hours ), 'phone_no' => esc_html( $phone ), 'sellonline' => (boolean) ( !$physical ? 1 : $sellonline ), 'sellonline2' => (boolean) $sellonline, 'extra' => @unserialize( $extra ), 'date' => $date, 'visible' => (boolean) $visible, 'views' => $views, 'reviews' => $reviews, 'stars' => $stars, 'coupons' => $coupons, 'products' => $products, 'is_popular' => (boolean) $popular, 'is_physical' => (boolean) $physical, 'url_title' => esc_html( $url_title ), 'link' => ( $seo_link ? \site\utils::make_seo_link( $seo_link_store, $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?store=' . $id ), 'reviews_link' => ( $seo_link ? \site\utils::make_seo_link( $seo_link_reviews, $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?reviews=' . $id ) ) );
+    
+        }
+    
+        $stmt->close();
+    
+        return $data;
+    
+        break;
+    
+        default:
+    
+        /* WHERE / ORDER BY */
+    
+        if( !empty( $categories['user'] ) ) {
+            $where[] = 'user = "' . (int) $categories['user'] . '"';
+        }
+    
+        if( !empty( $categories['ids'] ) && strcasecmp( $categories['ids'], 'all' ) != 0 ) {
+            $arr = array_filter( array_map( function( $w ){
+                return (int) $w;
+            }, explode( ',', $categories['ids'] ) ));
+            if( !empty( $arr ) )
+            $where[] = 'id IN(' . \site\utils::dbp( implode(',', $arr) ) . ')';
+            if( !isset( $categories['orderby'] ) ) {
+                $orderby[] = 'field(id,' . \site\utils::dbp( implode(',', $arr) ) . ')';
+            }
+        }
+    
+        if( !empty( $categories['search'] ) ) {
+            $search = implode( '.*', explode( ' ', trim( $categories['search'] ) ) );
+            $where[] = 'CONCAT(name, tags) REGEXP "' . \site\utils::dbp( $search ) . '"';
+        }
+    
+        /* */
+        
+        $stmt = $db->stmt_init();
+        $stmt->prepare( "SELECT id, feedID, user, category, popular, physical, name, link, description, tags, image, hours, phoneno, sellonline, visible, views, url_title, extra, date, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as votes, (SELECT AVG(stars) FROM " . DB_TABLE_PREFIX . "reviews WHERE store = s.id AND valid > 0) as rating, (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "coupons WHERE store = s.id AND visible > 0), (SELECT COUNT(*) FROM " . DB_TABLE_PREFIX . "products WHERE store = s.id AND visible > 0) FROM " . DB_TABLE_PREFIX . "stores s" . ( empty( $where ) ? '' : ' WHERE ' . implode( ' AND ', array_filter( $where ) ) ) . ( empty( $orderby ) ? '' : ' ORDER BY ' . implode( ', ', array_filter( $orderby ) ) ) . ( empty( $limit ) ? '' : ' LIMIT ' . implode( ',', $limit ) ) );
+        $stmt->execute();
+        $stmt->bind_result( $id, $feed_id, $user, $cat, $popular, $physical, $name, $link, $description, $tags, $image, $hours, $phone, $sellonline, $visible, $views, $url_title, $extra, $date, $reviews, $stars, $coupons, $products );
+    
+        $data = array();
+        while( $stmt->fetch() ) {
+    
+            $data[] = (object) value_with_filter( 'store_info_values', array( 'ID' => $id, 'feedID' => $feed_id, 'userID' => $user, 'catID' => $cat, 'name' => \site\content::title( 'stores_name_list', $name, $useem, $useec, $usefl ), 'url' => esc_html( $link ), 'description' => \site\content::content( 'stores_list', $description, $useem, $usesh, false, $useec, $usefl ), 'tags' => esc_html( $tags ), 'image' => esc_html( $image ), 'hours' => @unserialize( $hours ), 'phone_no' => esc_html( $phone ), 'sellonline' => (boolean) ( !$physical ? 1 : $sellonline ), 'sellonline2' => (boolean) $sellonline, 'extra' => @unserialize( $extra ), 'date' => $date, 'visible' => (boolean) $visible, 'views' => $views, 'reviews' => $reviews, 'stars' => $stars, 'coupons' => $coupons, 'products' => $products, 'is_popular' => (boolean) $popular, 'is_physical' => (boolean) $physical, 'url_title' => esc_html( $url_title ), 'link' => ( $seo_link ? \site\utils::make_seo_link( $seo_link_store, $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?store=' . $id ), 'reviews_link' => ( $seo_link ? \site\utils::make_seo_link( $seo_link_reviews, $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?reviews=' . $id ) ) );
+    
+        }
+    
+        $stmt->close();
+    
+        return $data;
+    
+        break;
+    
+        }
+    
+    }
+
+    public static function while_stores_custom($offset, $limit) {
+        global $db;
+
+         /** make or not seo links */
+         $seo_link = defined( 'SEO_LINKS' ) && SEO_LINKS ? true : false;
+         list( $seo_link_store, $seo_link_reviews, $extension ) = array( \query\main::get_option( 'seo_link_store' ), \query\main::get_option( 'seo_link_reviews' ), \query\main::get_option( 'extension' ) );
+
+        $stmt = $db->stmt_init();
+        $stmt->prepare("SELECT id, name, link, image, url_title FROM " . DB_TABLE_PREFIX . "stores s  ORDER BY name asc Limit 10");
+        $stmt->execute();
+        $stmt->bind_result( $id, $name, $link, $image, $url_title);
+    
+        // explain SELECT id, name, link, image, url_title FROM stores s where id IS NOT NULL AND name IS NOT NULL AND link IS NOT NULL AND image IS NOT NULL AND url_title IS NOT NULL ORDER BY name asc Limit 10;
+
+        $data = array();
+        while( $stmt->fetch() ) {
+    
+            $data[] = (object) value_with_filter( 'store_info_values', array( 'ID' => $id, 'name' => $name, 'image' => esc_html( $image ), 'url_title' => esc_html( $url_title ), 'link' => ( $seo_link ? \site\utils::make_seo_link( $seo_link_store, $name, $url_title, $id, $extension ) : $GLOBALS['siteURL'] . '?store=' . $id )  ) );
+    
+        }
+        $stmt->close();
+        return $data;    
     }
 
     /* NUMBER OF REWARDS */
@@ -3517,20 +3545,20 @@ class main
     /* ADD OPTION */
 
     public static function get_store_rating($store_id)
-    {  
+    {
         global $db;
-       
+
         $stmt = $db->stmt_init();
         $stmt->prepare("SELECT rating_number, FORMAT((total_points / rating_number),1) as average_rating FROM view_rating WHERE post_id = $store_id  AND status = 1");
         $stmt->execute();
         $stmt->bind_result($rating_number, $average_rating);
-   
+
         $data = array();
-        
-        while( $stmt->fetch() ) {
-           $data = array( 'rating_number' => $rating_number, 'average_rating' => $average_rating);
+
+        while ($stmt->fetch()) {
+            $data = array('rating_number' => $rating_number, 'average_rating' => $average_rating);
         }
-        
+
         $stmt->close();
         return $data;
     }

@@ -60,6 +60,10 @@ function items( $category = array(), $special = array() ) {
     return \query\main::while_stores( $category, '', $special );
 }
 
+function items_custommmm( $offset, $limit) {
+    return \query\main::while_stores_custom( NULL, NULL );
+}
+
 /* ACTION BEFORE DISPLAYING THE CONTENT */
 
 do_action( 'before_stores_page' );

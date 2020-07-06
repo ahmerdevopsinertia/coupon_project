@@ -1,6 +1,7 @@
 <?php
 
 
+
 $store = the_item();
 $avg_store_rating = 0;
 
@@ -28,11 +29,10 @@ if (!empty($_GET['active'])) {
 }
 
 $type = searched_type(); ?>
-
 <div class="backgrnd">
     <div class="hero-title">
         <div class="container">
-
+            <h2><?php tse($store->name); ?></h2>
         </div>
     </div>
 </div>
@@ -43,7 +43,7 @@ $type = searched_type(); ?>
             <div class="col-lg-3 col-md-4">
                 <div class="store-logo text-center">
                     <?php if (empty($store->image)) { ?>
-                        <div class="st_logobox"><span><?php echo $store->name; ?></span></div>
+                        <div><?php echo $store->name; ?></div>
                     <?php } else { ?>
                         <img src="<?php echo store_avatar((!empty($store->image) ? $store->image : '')); ?>" alt="<?php tse($store->name); ?>" />
                     <?php } ?>
@@ -60,54 +60,46 @@ $type = searched_type(); ?>
                 </div>
             </div>
             <div class="col-lg-8 col-md-8 offset-lg-1 m-mt-30">
-                <div class="store_backgrnd">
-                    <h1 class="store_h1"><?php tse($store->name); ?> Coupon Codes </h1>
-                    <h2 class="store_h2"> Save with 50 <?php tse($store->name); ?> Offers. </h2>
-                </div>
-
-                <!--      <h6><?php te('theme_t_s_description', 'Description'); ?></h6>
-            <?php echo (!empty($store->description) ? ts($store->description) : t('theme_no_description', 'No description.'));
-            if ($store->is_physical) {
-                echo '<ul class="store-info-list">';
-                if (!empty($store->hours)) {
-                    $today = strtolower(date('l'));
-                    echo '<li><a href="#" class="hours"><h6><i class="far fa-clock"></i> ' . sprintf(t('theme_store_hours_today', 'Hours ( Today: %s )'), (isset($store->hours[$today]['opened']) ? $store->hours[$today]['from'] . ' - ' . $store->hours[$today]['to'] : t('theme_store_closed', 'Closed'))) . '</a></h6>';
-                    $daysofweek = days_of_week();
-                    echo '<ul class="store-hours">';
-                    foreach ($daysofweek as $day => $dayn) {
-                        echo '<li' . ($day === $today ? ' class=\'htoday\'' : '') . '><span>' . $dayn . ':</span> <b>' . (isset($store->hours[$day]['opened']) ? $store->hours[$day]['from'] . ' - ' . $store->hours[$day]['to'] : t('theme_store_closed', 'Closed')) . '</b></li>';
-                    }
-                    echo '</ul>
+                <h6><?php te('theme_t_s_description', 'Description'); ?></h6>
+                <?php echo (!empty($store->description) ? ts($store->description) : t('theme_no_description', 'No description.'));
+                if ($store->is_physical) {
+                    echo '<ul class="store-info-list">';
+                    if (!empty($store->hours)) {
+                        $today = strtolower(date('l'));
+                        echo '<li><a href="#" class="hours"><h6><i class="far fa-clock"></i> ' . sprintf(t('theme_store_hours_today', 'Hours ( Today: %s )'), (isset($store->hours[$today]['opened']) ? $store->hours[$today]['from'] . ' - ' . $store->hours[$today]['to'] : t('theme_store_closed', 'Closed'))) . '</a></h6>';
+                        $daysofweek = days_of_week();
+                        echo '<ul class="store-hours">';
+                        foreach ($daysofweek as $day => $dayn) {
+                            echo '<li' . ($day === $today ? ' class=\'htoday\'' : '') . '><span>' . $dayn . ':</span> <b>' . (isset($store->hours[$day]['opened']) ? $store->hours[$day]['from'] . ' - ' . $store->hours[$day]['to'] : t('theme_store_closed', 'Closed')) . '</b></li>';
+                        }
+                        echo '</ul>
                     </li>';
-                }
-                if (!empty($store->phone_no)) {
-                    echo '<li><h6><i class="fa fa-phone"></i> ' . t('theme_phone_no', 'Phone Number') . '</h6>' . $store->phone_no . '</li>';
-                }
-                $locations = store_locations($store->ID);
-                if (!empty($locations)) {
-                    echo '<li><h6><i class="fas fa-map-marker-alt"></i> ' . t('theme_t_s_locations', 'Locations') . '</h6><ul class="store-locations">';
-                    foreach ($locations as $location) {
-                        echo '<li data-lat="' . $location->lat . '" data-lng="' . $location->lng . '" data-title="' . implode(', ', array($location->city, $location->state)) . '" data-content="' . implode(', ', array($location->address, $location->zip)) . '">
+                    }
+                    if (!empty($store->phone_no)) {
+                        echo '<li><h6><i class="fa fa-phone"></i> ' . t('theme_phone_no', 'Phone Number') . '</h6>' . $store->phone_no . '</li>';
+                    }
+                    $locations = store_locations($store->ID);
+                    if (!empty($locations)) {
+                        echo '<li><h6><i class="fas fa-map-marker-alt"></i> ' . t('theme_t_s_locations', 'Locations') . '</h6><ul class="store-locations">';
+                        foreach ($locations as $location) {
+                            echo '<li data-lat="' . $location->lat . '" data-lng="' . $location->lng . '" data-title="' . implode(', ', array($location->city, $location->state)) . '" data-content="' . implode(', ', array($location->address, $location->zip)) . '">
                             <a href="#" data-map-recenter="' . $location->lat . ',' . $location->lng . '">' . implode(', ', array($location->address, $location->zip, $location->city, $location->state, $location->country)) . '</a> <a href="//www.google.com/maps?saddr=My+Location&daddr=' . implode(',', [$location->lat, $location->lng]) . '" class="get-direction" target="_blank"><i class="fas fa-walking"></i> ' . t('theme_get_directions', 'Get directions') . '</a>
                         </li>';
+                        }
+                        echo '</ul>';
                     }
-                    echo '</ul>';
-                }
-                if (google_maps() && !empty($locations)) {
-                    $map_zoom = get_theme_option('map_zoom');
-                    $map_marker_icon = get_theme_option('map_marker_icon'); ?>
-                <li id="map_wrapper">
-                    <div id="map_canvas" data-zoom="<?php echo (!empty($map_zoom) && is_numeric($map_zoom) ? (int) $map_zoom : 16); ?>" data-lat="<?php echo $locations[0]->lat; ?>" data-lng="<?php echo $locations[0]->lng; ?>" data-marker-icon="<?php echo (!empty($map_marker_icon) ? $map_marker_icon : THEME_LOCATION . '/assets/img/pin.png'); ?>"></div>
-                </li>
+                    if (google_maps() && !empty($locations)) {
+                        $map_zoom = get_theme_option('map_zoom');
+                        $map_marker_icon = get_theme_option('map_marker_icon'); ?>
+                        <li id="map_wrapper">
+                            <div id="map_canvas" data-zoom="<?php echo (!empty($map_zoom) && is_numeric($map_zoom) ? (int) $map_zoom : 16); ?>" data-lat="<?php echo $locations[0]->lat; ?>" data-lng="<?php echo $locations[0]->lng; ?>" data-marker-icon="<?php echo (!empty($map_marker_icon) ? $map_marker_icon : THEME_LOCATION . '/assets/img/pin.png'); ?>"></div>
+                        </li>
                 <?php }
-                echo '</ul>';
-            } ?> -->
+                    echo '</ul>';
+                } ?>
                 <div>
                     <script language="javascript" type="text/javascript">
                         $(function() {
-                            console.log('location', '/' + window.location.hostname + '/rating.php');
-                            console.log('location', window.location.href);
-                            console.log('location', window.location.pathname);
                             var avgRating = $('#avg_rating').val();
                             $("#rating_star").spaceo_rating_widget({
                                 starLength: '5',
@@ -121,8 +113,8 @@ $type = searched_type(); ?>
                         function processRating(val, attrVal) {
                             var storeId = $('#store_id_for_rating').val();
                             $.ajax({
-                                url: '/rating.php',
                                 type: 'POST',
+                                url: '/rating.php',
                                 data: 'post_id=' + storeId + '&points=' + val,
                                 dataType: 'json',
                                 success: function(data) {
@@ -135,50 +127,48 @@ $type = searched_type(); ?>
                                     }
                                 },
                                 error: function(err) {
+                                    // console.log('err', err);
                                     alert('You have rated ' + val);
-                                    location.reload();
                                 }
                             });
                         }
                     </script>
                     <br>
-                    <?php $avg_store_rating = get_store_rating($store->ID)['average_rating'];
-                    $rating_number = get_store_rating($store->ID)['rating_number'];  ?>
+                    <?php $avg_store_rating = get_store_rating($store->ID)['average_rating'];  ?>
                     <input id="avg_rating" name="avg_rating" value="<?php echo $avg_store_rating; ?>" type="hidden" />
                     <input id="store_id_for_rating" name="store_id_for_rating" value="<?php echo $store->ID; ?>" type="hidden" />
                     <input name="rating" value="0" id="rating_star" type="hidden" postID="1" />
-                    <div class="overall-rating">(Rated <span id="avgrat"><?php echo ($avg_store_rating === NULL) ? 0 : $avg_store_rating; ?></span>
-                        / 5 by <span id="totalrat"><?php echo ($rating_number === NULL) ? 0 : $rating_number;  ?></span> users)</span></div>
+                    <div class="overall-rating">(Average Rating <span id="avgrat"><?php echo $avg_store_rating; ?></span>
+                        Based on <span id="totalrat"><?php echo get_store_rating($store->ID)['rating_number']; ?></span> rating)</span></div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-</div>
 
-<div class="bgGray pt-75 pb-75 clearfix store-bg">
+<div class="bgGray pt-75 pb-75 clearfix">
     <div class="container">
         <?php echo do_action('store_before_items'); ?>
 
         <div class="mb-40 clearfix">
-            <!--   <?php $types = array();
-                    $types['coupons'] = array('label' => t('coupons', 'Coupons'), 'url' => get_update(array('type' => 'coupons'), get_remove(array('page', 'type'))));
-                    if (couponscms_has_products()) {
-                        $types['products'] = array('label' => t('', ''), 'url' => get_update(array('type' => 'products'), get_remove(array('page', 'type'))));
-                    } ?>
+            <?php $types = array();
+            $types['coupons'] = array('label' => t('coupons', 'Coupons'), 'url' => get_update(array('type' => 'coupons'), get_remove(array('page', 'type'))));
+            if (couponscms_has_products()) {
+                $types['products'] = array('label' => t('', ''), 'url' => get_update(array('type' => 'products'), get_remove(array('page', 'type'))));
+            } ?>
             <ul class="options float-left">
                 <li class="contains-sub-menu pb-10"><a href="#"><?php echo $types[$type]['label']; ?> <i class="fa fa-angle-down"></i></a>
                     <ul>
-                    <?php foreach ($types as $cur_type => $type2) {
-                        echo '<li' . ($cur_type == $type ? ' class="active"' : '') . '><a href="' . $type2['url'] . '">' . $type2['label'] . '</a></li>';
-                    } ?>
+                        <?php foreach ($types as $cur_type => $type2) {
+                            echo '<li' . ($cur_type == $type ? ' class="active"' : '') . '><a href="' . $type2['url'] . '">' . $type2['label'] . '</a></li>';
+                        } ?>
                     </ul>
                 </li>
             </ul>
-             <a href="<?php echo get_update(['active' => $active[0]], get_remove(['page'])); ?>" class="float-right"><?php echo $active[1] . ' ' . t('theme_active_only', 'Active only'); ?></a> -->
+            <a href="<?php echo get_update(['active' => $active[0]], get_remove(['page'])); ?>" class="float-right"><?php echo $active[1] . ' ' . t('theme_active_only', 'Active only'); ?></a>
         </div>
         <div class="date-time">
-            <h1><strong><?php tse($store->name); ?> Coupons & Promo Codes For <?php echo date("jS F Y"); ?></strong>| Updated 5 hours ago </h1>
+            <strong><?php tse($store->name); ?> Coupons & Promo Codes For <?php echo date("jS F Y"); ?></strong> | Updated 5 hours ago
         </div>
 
         <?php if ($type === 'products') {
@@ -207,9 +197,8 @@ $type = searched_type(); ?>
                 echo '</div>';
             } else {
                 echo '<div class="list clearfix">';
-                echo '<div class="similar-stores">' . '<h3>Check Out Coupons For Similar Stores</h3>' . '</div>';
-                $newItemCustom = items_custom( array( 'show' => ',active', 'orderby' => 'rand', 'max' => option( 'items_per_page' ) ) );
-                foreach ($newItemCustom as $item) {
+                echo '<div class="">' . '<h3>Check Out Coupons For Similar Stores</h3>' . '</div>';
+                foreach (items_custom(array('show' => ',active', 'orderby' => 'rand', 'max' => option('items_per_page'))) as $item) {
                     echo couponscms_coupon_item($item, false, true);
                 }
                 echo '</div>';
@@ -219,64 +208,14 @@ $type = searched_type(); ?>
             echo couponscms_theme_pagination($results);
         }
 
-        echo do_action('store_after_items'); $newItemCustomParsed = json_decode(json_encode($newItemCustom), true); ?>
-
-
-
-
-
-        <div class="expire-code">
-            <h2>Popular <?php tse($store->name); ?> Promo Codes & Sales </h2>
-            <table class="hWUA-DY">
-                <thead>
-                    <tr class="befLDF">
-                        <th class="kAikQo">Discount</th>
-                        <th class="fedHQq">Description</th>
-                        <th class="hqjXLA">Expires</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr class="befLDF">
-                        <td class="foEPBX">FREE SHIPPING</td>
-                        <td class="foEPBX"><?php if (isset($newItemCustomParsed[0])) {
-                                                echo $newItemCustomParsed[0]['title'];
-                                            } else {
-                                                echo 'None';
-                                            } ?></td>
-                        <td class="foEPBX">-</td>
-                    </tr>
-                    <tr class="befLDF">
-                        <td class="foEPBX">UP TO 15% OFF</td>
-                        <td class="foEPBX"><?php if (isset($newItemCustomParsed[0])) {
-                                                echo $newItemCustomParsed[1]['title'];
-                                            } else {
-                                                echo 'None';
-                                            } ?></td>
-                        <td class="foEPBX"><?php echo date("jS F Y"); ?></td>
-                    </tr>
-                    <tr class="befLDF">
-                        <td class="foEPBX">SALE</td>
-                        <td class="foEPBX"><?php if (isset($newItemCustomParsed[0])) {
-                                                echo $newItemCustomParsed[2]['title'];
-                                            } else {
-                                                echo 'None';
-                                            } ?></td>
-                        <td class="foEPBX">-</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-
-
-
-
+        echo do_action('store_after_items'); ?>
 
 
         <div class="coups_sidebar_inner">
             <div class="about_store">
                 <h2>About <?php tse($store->name); ?></h2>
                 <p></p>
-                <p><?php tse($store->name); ?> has currently some deals & coupons on xxcoupons.com that will help you to get discounts you wouldn't have imagined. <?php tse($store->name); ?> offers the best prices and more, all of which you can have sent straight to your door <?php tse($store->name); ?> Coupon will help you save money. For more savings and discounts, please visit the official online store of <?php tse($store->name); ?></p>
+                <p><?php tse($store->name); ?> has currently 35 deals &amp; coupons on xxcoupons.com that will help you to get discounts you wouldn't have imagined. <?php tse($store->name); ?>. offers the best prices &amp; more. <?php tse($store->name); ?> Coupon will help you save an average of $15. For more savings and discounts, please visit the official online store of <?php tse($store->name); ?></p>
                 <p></p>
             </div>
 
@@ -325,7 +264,7 @@ $type = searched_type(); ?>
             <p>Welcome to the <?php tse($store->name); ?> page on xxcoupons.com. Here you can find the biggest available collection of <?php tse($store->name); ?> coupons and online codes. We are excited to provide you 0 coupon codes, 14 promotional sales coupons. You can also find a variety of in-store deals for <?php tse($store->name); ?>. </p>
 
             <button class="accordion">
-                <h1 class="acc_head">What are the <?php tse($store->name); ?> newest coupon codes?</h1>
+                <h4>What are the <?php tse($store->name); ?> newest coupon codes?</h4>
             </button>
             <div class="panel">
                 <p>View all Products</br>
@@ -333,21 +272,21 @@ $type = searched_type(); ?>
             </div>
 
             <button class="accordion">
-                <h1 class="acc_head">What amount can I save on average, using <?php tse($store->name); ?> coupon codes?</h1>
+                <h4>What amount can I save on average, using <?php tse($store->name); ?> coupon codes?</h4>
             </button>
             <div class="panel">
                 <p>The average discount for <?php tse($store->name); ?> is you can have $15 at checkout.</p>
             </div>
 
             <button class="accordion">
-                <h1 class="acc_head">When did the last coupon update?</h1>
+                <h4>When did the last coupon update?</h4>
             </button>
             <div class="panel">
                 <p>The latest coupon was updated 7 hours ago.</p>
             </div>
 
             <button class="accordion">
-                <h1 class="acc_head">How can I be notified about the latest coupon codes for <?php tse($store->name); ?>?</h1>
+                <h4>How can I be notified about the latest coupon codes for <?php tse($store->name); ?>?</h4>
             </button>
             <div class="panel">
                 <p>Simply subscribe to the xxcoupons.com newsletter for <?php tse($store->name); ?>. New deals and discount offers will be directly sent to your inbox. Trust us, we won't spam you at all.</p>
@@ -355,7 +294,7 @@ $type = searched_type(); ?>
             </div>
 
             <button class="accordion">
-                <h1 class="acc_head">I'm an absolute noob. Please guide me how to use the codes?</h1>
+                <h4>I'm an absolute noob. Please guide me how to use the codes?</h4>
             </button>
             <div class="panel">
                 <p>Easy peasy...</p>
@@ -371,7 +310,7 @@ $type = searched_type(); ?>
             </div>
 
             <button class="accordion">
-                <h1 class="acc_head">Can I submit a <?php tse($store->name); ?> coupon code?</h1>
+                <h4>Can I submit a <?php tse($store->name); ?> coupon code?</h4>
             </button>
             <div class="panel">
                 <p>That's great. Please submit the code by using our "Submit a code" form. After all, sharing is caring!</p>
@@ -379,7 +318,7 @@ $type = searched_type(); ?>
             </div>
 
             <button class="accordion">
-                <h1 class="acc_head">What else can I do?</h1>
+                <h4>What else can I do?</h4>
             </button>
             <div class="panel">
                 <p>Subscribe for our new coupon alerts and bookmark this page for future use. Happy couponing!</p>
@@ -403,21 +342,5 @@ $type = searched_type(); ?>
             </script>
         </div>
 
-    </div>
-</div>
-
-<div class="newslet">
-    <div class="hero-search pt-75 pb-75 clearfix" id="newsletter_form">
-        <div class="container">
-            <p class="bucket-title1">Get the top deals from 100s of retailers, including <?php tse($store->name); ?>, in the Best of xxcoupons emails.</p>
-            <div class="search-form-container mt-50">
-                <div class="subscribe_form other_form">
-                    <form method="POST" action="#subscribe_form">
-                        <input type="email" name="newsletter_form_index_form[email]" value="" placeholder="Email Address" required=""><input type="hidden" name="newsletter_form_index_form[csrf]" value="mKhA7YUQ68ZR">
-                        <button>Subscribe</button>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 </div>
