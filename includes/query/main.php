@@ -3220,7 +3220,7 @@ class main
          list( $seo_link_store, $seo_link_reviews, $extension ) = array( \query\main::get_option( 'seo_link_store' ), \query\main::get_option( 'seo_link_reviews' ), \query\main::get_option( 'extension' ) );
 
         $stmt = $db->stmt_init();
-        $stmt->prepare("SELECT id, name, link, image, url_title FROM " . DB_TABLE_PREFIX . "stores s  ORDER BY name asc Limit 10");
+        $stmt->prepare("SELECT id, name, link, image, url_title FROM " . DB_TABLE_PREFIX . "stores s  ORDER BY name asc");
         $stmt->execute();
         $stmt->bind_result( $id, $name, $link, $image, $url_title);
     

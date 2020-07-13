@@ -139,7 +139,7 @@ function value_with_filter( $filter = '', $default = '', $extra = '' ) {
         }
     }
 
-    if ($filter == 'meta-description' || $filter == 'site-title-tag') {
+    if ($filter == 'meta-description' || $filter == 'site-title-tag' || $filter == 'og-meta-title' || $filter == 'og-meta-description')  {
         $month = $year = null;
         $stringArray = explode(" ", $default);
         $defaultArray = $stringArray;
