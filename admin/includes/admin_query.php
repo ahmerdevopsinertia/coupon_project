@@ -82,14 +82,14 @@ public static function suggestion_info( $id = 0 ) {
     $id = empty( $id ) ? $_GET['id'] : $id;
 
     $stmt = $db->stmt_init();
-    $stmt->prepare("SELECT id, user, type, viewed, name, url, description, message, date FROM " . DB_TABLE_PREFIX . "suggestions WHERE id = ?");
+    $stmt->prepare("SELECT id, user, type, viewed, name, url, description, message, date, email FROM " . DB_TABLE_PREFIX . "suggestions WHERE id = ?");
     $stmt->bind_param( "i", $id );
     $stmt->execute();
-    $stmt->bind_result( $id, $user, $type, $read, $name, $url, $description, $message, $date );
+    $stmt->bind_result( $id, $user, $type, $read, $name, $url, $description, $message, $date, $email );
     $stmt->fetch();
     $stmt->close();
 
-    return (object) array( 'ID' => $id, 'user' => $user, 'type' => $type, 'read' => $read, 'name' => esc_html( $name ), 'url' => esc_html( $url ), 'description' => esc_html( $description ), 'message' => esc_html( $message ), 'date' => $date );
+    return (object) array( 'ID' => $id, 'user' => $user, 'type' => $type, 'read' => $read, 'name' => esc_html( $name ), 'url' => esc_html( $url ), 'description' => esc_html( $description ), 'message' => esc_html( $message ), 'date' => $date, 'email' => $email );
 
 }
 

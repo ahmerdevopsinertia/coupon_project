@@ -850,9 +850,9 @@ public static function suggest_store( $id, $post, $intent ) {
     } else {
 
         $stmt = $db->stmt_init();
-        $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "suggestions (user, type, name, url, description, message, date) VALUES (?, ?, ?, ?, ?, ?, NOW())" );
+        $stmt->prepare( "INSERT INTO " . DB_TABLE_PREFIX . "suggestions (user, type, name, url, description, message, date, email) VALUES (?, ?, ?, ?, ?, ?, NOW())" );
 
-        $stmt->bind_param( "iissss", $id, $post['intent'], $post['name'], $post['url'], $post['description'], $post['message'] );
+        $stmt->bind_param( "iisssss", $id, $post['intent'], $post['name'], $post['url'], $post['description'], $post['message'], $post['email'] );
         $execute = $stmt->execute();
         $stmt->close();
 

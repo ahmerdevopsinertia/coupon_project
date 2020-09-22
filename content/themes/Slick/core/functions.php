@@ -117,11 +117,12 @@ function couponscms_search_form( $extra_class = '', $show_title = true ) {
 /* INDEX ITEMS */
 function couponscms_home_items() {
     $items_on_home = value_with_filter( 'index_items', get_theme_option( 'items_on_index' ) );
-
+    
     $markup = '';
     if( $items_on_home ) {
         if( is_array( $items_on_home ) ) {
             foreach( $items_on_home as $type ) {
+                
                 if( isset( $type['block']['hide'] ) ) continue;
                 $background = $limit = $orderby = $show = '';
                 if( !empty( $type['block']['background'] ) && in_array( $type['block']['background'], [ 'bgGray', 'bgWhite', 'bgBlack' ] ) ) {
